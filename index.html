@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC Mobile 27 Companion</title>
+    <style>
+        body { font-family: sans-serif; background-color: #1a1a1a; color: #fff; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: #2a2a2a; padding: 20px; border-radius: 10px; }
+        .player-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        input { flex: 1; padding: 10px; border-radius: 5px; border: none; }
+        button { width: 100%; padding: 15px; background: #7b2cbf; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #result { text-align: center; margin-top: 20px; font-size: 24px; color: #00ffcc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>FC Mobile 27 OVR Calculator</h2>
+        <p>Enter your 11 starters' Base OVR and Rank (0-5).</p>
+        <div id="player-inputs"></div>
+        <button onclick="calculate()">Calculate Team OVR</button>
+        <div id="result"></div>
+    </div>
+    <script>
+        // Generate 11 input rows
+        const container = document.getElementById('player-inputs');
+        for (let i = 1; i <= 11; i++) {
+            container.innerHTML += `
+                <div class="player-row">
+                    <span>Player ${i}</span>
+                    <input type="number" id="base${i}" placeholder="Base OVR" value="100">
+                    <input type="number" id="rank${i}" placeholder="Rank" value="0">
+                </div>
+            `;
+        }
+
+        async function calculate() {
+            let bases = [], ranks = [];
+            for (let i = 1; i <= 11; i++) {
+                bases.push(parseInt(document.getElementById('base' + i).value) || 0);
+                ranks.push(parseInt(document.getElementById('rank' + i).value) || 0);
+            }
+
+            const response = await fetch('http://localhost:3000/api/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bases, ranks, badges: 0 })
+            });
+            const data = await response.json();
+            document.getElementById('result').innerText = "Team OVR: " + data.teamOvr;
+        }
+    </script>
+</body>
+</html>
