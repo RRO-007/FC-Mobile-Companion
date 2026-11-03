@@ -4,36 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FC Mobile 27 Companion</title>
-    <style>
-        body { font-family: sans-serif; background-color: #1a1a1a; color: #fff; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: #2a2a2a; padding: 20px; border-radius: 10px; }
-        .player-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        input { flex: 1; padding: 10px; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 15px; background: #7b2cbf; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        #result { text-align: center; margin-top: 20px; font-size: 24px; color: #00ffcc; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h2>FC Mobile 27 OVR Calculator</h2>
-        <p>Enter your 11 starters' Base OVR and Rank (0-5).</p>
-        <div id="player-inputs"></div>
-        <button onclick="calculate()">Calculate Team OVR</button>
-        <div id="result"></div>
-    </div>
-    <script>
-        // Generate 11 input rows
-        const container = document.getElementById('player-inputs');
-        for (let i = 1; i <= 11; i++) {
-            container.innerHTML += `
-                <div class="player-row">
-                    <span>Player ${i}</span>
-                    <input type="number" id="base${i}" placeholder="Base OVR" value="100">
-                    <input type="number" id="rank${i}" placeholder="Rank" value="0">
-                </div>
-            `;
-        }
+    <header>
+        <h1>FC Mobile 27</h1>
+        <div class="team-ovr-display">
+            <span id="result">0</span> <span class="ovr-label">OVR</span>
+        </div>
+    </header>
 
+    <main class="pitch-container">
+        <div class="pitch">
+            <!-- Forwards -->
+            <div class="row forwards">
+                <div class="player-card" id="card1">
+                    <span class="pos">LW</span>
+                    <input type="number" id="base1" placeholder="OVR" value="100">
+                    <input type="number" id="rank1" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card2">
+                    <span class="pos">ST</span>
+                    <input type="number" id="base2" placeholder="OVR" value="100">
+                    <input type="number" id="rank2" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card3">
+                    <span class="pos">RW</span>
+                    <input type="number" id="base3" placeholder="OVR" value="100">
+                    <input type="number" id="rank3" placeholder="Rank" value="0">
+                </div>
+            </div>
+
+            <!-- Midfielders -->
+            <div class="row midfielders">
+                <div class="player-card" id="card4">
+                    <span class="pos">CM</span>
+                    <input type="number" id="base4" placeholder="OVR" value="100">
+                    <input type="number" id="rank4" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card5">
+                    <span class="pos">CAM</span>
+                    <input type="number" id="base5" placeholder="OVR" value="100">
+                    <input type="number" id="rank5" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card6">
+                    <span class="pos">CM</span>
+                    <input type="number" id="base6" placeholder="OVR" value="100">
+                    <input type="number" id="rank6" placeholder="Rank" value="0">
+                </div>
+            </div>
+
+            <!-- Defenders -->
+            <div class="row defenders">
+                <div class="player-card" id="card7">
+                    <span class="pos">LB</span>
+                    <input type="number" id="base7" placeholder="OVR" value="100">
+                    <input type="number" id="rank7" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card8">
+                    <span class="pos">CB</span>
+                    <input type="number" id="base8" placeholder="OVR" value="100">
+                    <input type="number" id="rank8" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card9">
+                    <span class="pos">CB</span>
+                    <input type="number" id="base9" placeholder="OVR" value="100">
+                    <input type="number" id="rank9" placeholder="Rank" value="0">
+                </div>
+                <div class="player-card" id="card10">
+                    <span class="pos">RB</span>
+                    <input type="number" id="base10" placeholder="OVR" value="100">
+                    <input type="number" id="rank10" placeholder="Rank" value="0">
+                </div>
+            </div>
+
+            <!-- Goalkeeper -->
+            <div class="row goalkeeper">
+                <div class="player-card" id="card11">
+                    <span class="pos">GK</span>
+                    <input type="number" id="base11" placeholder="OVR" value="100">
+                    <input type="number" id="rank11" placeholder="Rank" value="0">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="controls">
+        <button onclick="calculate()">Calculate Team OVR</button>
+    </div>
+
+    <script>
         async function calculate() {
             let bases = [], ranks = [];
             for (let i = 1; i <= 11; i++) {
@@ -47,8 +107,11 @@
                 body: JSON.stringify({ bases, ranks, badges: 0 })
             });
             const data = await response.json();
-            document.getElementById('result').innerText = "Team OVR: " + data.teamOvr;
+            document.getElementById('result').innerText = data.teamOvr;
         }
+        
+        // Calculate once on page load
+        window.onload = calculate;
     </script>
 </body>
 </html>
