@@ -18,18 +18,21 @@
         <div class="pitch">
             <!-- Forwards -->
             <div class="row forwards">
-                <div class="player-card" id="card1">
+                <div class="player-card">
                     <span class="pos">LW</span>
+                    <select id="player1" onchange="updatePlayer(1)"></select>
                     <input type="number" id="base1" placeholder="OVR" value="100">
                     <input type="number" id="rank1" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card2">
+                <div class="player-card">
                     <span class="pos">ST</span>
+                    <select id="player2" onchange="updatePlayer(2)"></select>
                     <input type="number" id="base2" placeholder="OVR" value="100">
                     <input type="number" id="rank2" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card3">
+                <div class="player-card">
                     <span class="pos">RW</span>
+                    <select id="player3" onchange="updatePlayer(3)"></select>
                     <input type="number" id="base3" placeholder="OVR" value="100">
                     <input type="number" id="rank3" placeholder="Rank" value="0">
                 </div>
@@ -37,18 +40,21 @@
 
             <!-- Midfielders -->
             <div class="row midfielders">
-                <div class="player-card" id="card4">
+                <div class="player-card">
                     <span class="pos">CM</span>
+                    <select id="player4" onchange="updatePlayer(4)"></select>
                     <input type="number" id="base4" placeholder="OVR" value="100">
                     <input type="number" id="rank4" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card5">
+                <div class="player-card">
                     <span class="pos">CAM</span>
+                    <select id="player5" onchange="updatePlayer(5)"></select>
                     <input type="number" id="base5" placeholder="OVR" value="100">
                     <input type="number" id="rank5" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card6">
+                <div class="player-card">
                     <span class="pos">CM</span>
+                    <select id="player6" onchange="updatePlayer(6)"></select>
                     <input type="number" id="base6" placeholder="OVR" value="100">
                     <input type="number" id="rank6" placeholder="Rank" value="0">
                 </div>
@@ -56,23 +62,27 @@
 
             <!-- Defenders -->
             <div class="row defenders">
-                <div class="player-card" id="card7">
+                <div class="player-card">
                     <span class="pos">LB</span>
+                    <select id="player7" onchange="updatePlayer(7)"></select>
                     <input type="number" id="base7" placeholder="OVR" value="100">
                     <input type="number" id="rank7" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card8">
+                <div class="player-card">
                     <span class="pos">CB</span>
+                    <select id="player8" onchange="updatePlayer(8)"></select>
                     <input type="number" id="base8" placeholder="OVR" value="100">
                     <input type="number" id="rank8" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card9">
+                <div class="player-card">
                     <span class="pos">CB</span>
+                    <select id="player9" onchange="updatePlayer(9)"></select>
                     <input type="number" id="base9" placeholder="OVR" value="100">
                     <input type="number" id="rank9" placeholder="Rank" value="0">
                 </div>
-                <div class="player-card" id="card10">
+                <div class="player-card">
                     <span class="pos">RB</span>
+                    <select id="player10" onchange="updatePlayer(10)"></select>
                     <input type="number" id="base10" placeholder="OVR" value="100">
                     <input type="number" id="rank10" placeholder="Rank" value="0">
                 </div>
@@ -80,8 +90,9 @@
 
             <!-- Goalkeeper -->
             <div class="row goalkeeper">
-                <div class="player-card" id="card11">
+                <div class="player-card">
                     <span class="pos">GK</span>
+                    <select id="player11" onchange="updatePlayer(11)"></select>
                     <input type="number" id="base11" placeholder="OVR" value="100">
                     <input type="number" id="rank11" placeholder="Rank" value="0">
                 </div>
@@ -94,6 +105,44 @@
     </div>
 
     <script>
+        let allPlayers = [];
+
+        // Fetch players from the backend database when the page loads
+        async function loadDatabase() {
+            try {
+                const response = await fetch('http://localhost:3000/api/players');
+                allPlayers = await response.json();
+                
+                // Populate all 11 dropdown menus
+                for (let i = 1; i <= 11; i++) {
+                    const select = document.getElementById('player' + i);
+                    select.innerHTML = '<option value="">-- Custom --</option>';
+                    
+                    allPlayers.forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player.id;
+                        option.text = `${player.name} (${player.base_ovr})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.log("Error loading database:", error);
+            }
+        }
+
+        // When a player is selected from a dropdown, fill their OVR
+        function updatePlayer(index) {
+            const selectedId = document.getElementById('player' + index).value;
+            if (selectedId) {
+                const player = allPlayers.find(p => p.id == selectedId);
+                if (player) {
+                    document.getElementById('base' + index).value = player.base_ovr;
+                }
+            }
+            calculate(); // Auto-calculate when a player is picked
+        }
+
+        // Send the numbers to the server to calculate the OVR
         async function calculate() {
             let bases = [], ranks = [];
             for (let i = 1; i <= 11; i++) {
@@ -101,17 +150,24 @@
                 ranks.push(parseInt(document.getElementById('rank' + i).value) || 0);
             }
 
-            const response = await fetch('http://localhost:3000/api/calculate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bases, ranks, badges: 0 })
-            });
-            const data = await response.json();
-            document.getElementById('result').innerText = data.teamOvr;
+            try {
+                const response = await fetch('http://localhost:3000/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bases, ranks, badges: 0 })
+                });
+                const data = await response.json();
+                document.getElementById('result').innerText = data.teamOvr;
+            } catch (error) {
+                console.log("Error calculating:", error);
+            }
         }
-        
-        // Calculate once on page load
-        window.onload = calculate;
+
+        // Run these when the page first loads
+        window.onload = async () => {
+            await loadDatabase();
+            calculate();
+        };
     </script>
 </body>
 </html>
