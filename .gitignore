@@ -1,0 +1,7 @@
+﻿# Exclude watcher, watch, and bundle files globally for this project
+*watcher*
+*watch*
+*bundle*
+
+# Dependencies
+node_modules/
