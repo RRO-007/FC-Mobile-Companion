@@ -1,7 +1,10 @@
-﻿# Exclude watcher, watch, and bundle files globally for this project
+﻿# Exclude watcher, watch, and bundle files globally for all other projects
 *watcher*
 *watch*
 *bundle*
 
-# Dependencies
+# Exclude dependency and build folders
 node_modules/
+dist/
+build/
+__pycache__/
